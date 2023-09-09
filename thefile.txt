@@ -1,4 +1,4 @@
-ing Spatial Data Services, 2.0
+Bing Spatial Data Services, 2.0
 Id,GeocodeRequest/Culture,GeocodeRequest/Address/AddressLine,GeocodeRequest/Address/Locality,GeocodeRequest/Address/AdminDistrict,  GeocodeResponse/Address/AddressLine, GeocodeResponse/Address/Locality, GeocodeResponse/Address/AdminDistrict, GeocodeResponse/Address/PostalCode,  GeocodeResponse/Point/Latitude, GeocodeResponse/Point/Longitude, GeocodeResponse/Confidence, StatusCode, FaultReason
 1,en-US,,,
 1,en-US,,,101010
