@@ -1,0 +1,91 @@
+<html>
+<body>
+<H2>Process Geocode Uploaded Address File</h2>
+
+Data Location:<br /><input id="dataLocation" value="" style="width:100%" />
+<i>Sample - https://raw.githubusercontent.com/metinca916/data/main/datatogeocode.txt</i><br />
+<br /><br />
+API KEY:<br /><input id="apiKey" value=""  style="width:100%" />
+<br /><br />
+<button id="processData">Process data</button>
+
+<br /><br />
+<strong>Batch Type: </strong><span id="batchType"></span><br />
+<strong>Items to Geocode: </strong><span id="itemsCount"></span><br />
+<strong>Process Status: </strong><span id="processStatus"></span><br />
+
+
+<script>
+		
+		document.getElementById("processData").addEventListener("click", function(){
+			setTimeout(function(){processData();}, 200); 
+		});
+		
+		
+			async function fetchData(url) { 
+				const response = await fetch(url); 
+				if (!response.ok) { 
+					const message = `An error has occured: ${response.status}`; 
+				throw new Error(message); 
+				} 	
+
+				const json = await response.json(); 
+				return json; 
+			} 
+	
+		const sleepNow = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+		
+		async function processData() {		
+		
+        var theDataLocation = document.getElementById("dataLocation").value;
+        var theBingKey = document.getElementById("apiKey").value;
+		
+		var BINGurl = "https://spatial.virtualearth.net/REST/v1/dataflows/geocode?dataLocation=" + theDataLocation + "&input=csv&key=" + theBingKey;
+		var BINGxhr = new XMLHttpRequest();
+		var BingStatusXhr = new XMLHttpRequest();
+		
+		var BINGurl = "https://spatial.virtualearth.net/REST/v1/dataflows/geocode?dataLocation=" + theDataLocation + "&input=csv&key=" + theBingKey;
+						BINGxhr.open("POST", BINGurl, false);
+						BINGxhr.send();
+				
+				
+						var BINGdata = BINGxhr.responseText;
+						var BINGResponse = JSON.parse(BINGdata);
+						console.log(BINGResponse);
+						if(BINGResponse.statusDescription == "Unauthorized") {
+								document.getElementById("batchType").innerHTML = "<strong>Error:</strong> API Key not valid.";
+						}
+						else{
+							if(BINGResponse.statusDescription == "Bad Request") {
+								document.getElementById("batchType").innerHTML = "<strong>Error:</strong> Could not retreive data from data location. Please verify data location. ";
+							}
+							else {
+								document.getElementById("batchType").innerHTML = BINGResponse.resourceSets[0].resources[0].description;
+								document.getElementById("itemsCount").innerHTML = BINGResponse.resourceSets[0].resources[0].totalEntityCount;
+								document.getElementById("processStatus").innerHTML = BINGResponse.resourceSets[0].resources[0].status + " (status will change when complete)";
+								var statusValue = BINGResponse.resourceSets[0].resources[0].status;
+								
+								do {
+									//setTimeout(async function() {  
+										await sleepNow(3000);
+										var data = await fetchData(BINGResponse.resourceSets[0].resources[0].links[0].url + "?key=" + theBingKey); 
+										statusValue = data.resourceSets[0].resources[0].status
+										console.log(data);
+									//}, 3000);
+								} while (statusValue=="Pending");
+								
+								if (statusValue == "Completed") {
+									document.getElementById("processStatus").innerHTML = statusValue + " <a target=\"top\" href=\""+ data.resourceSets[0].resources[0].links[1].url + "?key=" + theBingKey +"\">Download File</a>";
+								}
+				
+							}
+						}
+						
+		
+		}
+</script>
+
+</body>
+</html>
+
+
